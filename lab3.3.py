@@ -7,39 +7,40 @@ import kivy.uix.button
 
 
 class GenesContainer:
-    def __init__(self, count=10, coefs=(1, 2, 3, 4), y=14, mutation_probability=0.05):
+    def __init__(self, count=10, coefs=(1,2,3,4), y=14, mutation_probability=0.05):
         self.y = y
         self.length = count
         self.coefs = coefs
         self.gene_length = len(coefs)
         self.mutate_prob = mutation_probability
         self.genes = [Gene(length=self.gene_length) for _ in range(self.length)]
-        self.deltas = [i * self.coefs - self.y for i in self.genes]
-
+        self.deltas = [i*self.coefs-self.y for i in self.genes]        
+    
     def mutate(self):
         """Mutate random gene with probability mutate_prob."""
         if random.random() < self.mutate_prob:
             random.choice(self.genes).mutate()
-
+    
     def next_generation(self):
         """Cross genes in pairs."""
-        self.inverse_deltas = [1 / i for i in self.deltas]
-        self.ps = [i / sum(self.inverse_deltas) for i in self.inverse_deltas]
+        self.inverse_deltas = [1/i for i in self.deltas]
+        self.ps = [i/sum(self.inverse_deltas) for i in self.inverse_deltas]
         self.mutate()
 
-        a, b = random.randint(0, self.length - 1), random.randint(0, self.length - 1)
+        a, b = random.randint(0, self.length-1), random.randint(0, self.length-1)
         self.genes[a], self.genes[b] = self.genes[a] | self.genes[b]
-        self.deltas = [i * self.coefs - self.y for i in self.genes]
-
-    @property
+        self.deltas = [i*self.coefs-self.y for i in self.genes]
+       
+    @property     
     def done(self):
         return 0 in self.deltas
-
+    
     @property
     def result(self):
         while not self.done:
             self.next_generation()
         return self.genes[self.deltas.index(0)]
+
 
     def __str__(self):
         return str(self.deltas)
@@ -51,10 +52,10 @@ class Gene:
             self.value = value
         else:
             self.value = [random.randint(0, 10) for _ in range(length)]
-
+    
     def mutate(self):
         """Mutate random gene parameter."""
-        self.value[random.randint(0, len(self.value) - 1)] += random.choice((1, -1))
+        self.value[random.randint(0, len(self.value)-1)] += random.choice((1, -1))
 
     @property
     def length(self):
@@ -74,11 +75,11 @@ class Gene:
         """Return gene multiply by weights"""
         if len(other) != self.length:
             assert "Different lengths"
-        return sum([self.value[i] * other[i] for i in range(self.length)])
-
+        return sum([self.value[i]*other[i] for i in range(self.length)])
+    
     def __str__(self):
         return str(self.value)
-
+    
     def __repr__(self):
         return str(self.value)
 
@@ -111,8 +112,6 @@ class SimpleApp(kivy.app.App):
             self.label.text = f'Результат: {result}'
         except:
             self.label.text = "Введено некоректні значення"
-
-
 if __name__ == "__main__":
     simpleApp = SimpleApp()
     simpleApp.run()
